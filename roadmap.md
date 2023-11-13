@@ -4,4 +4,5 @@
 * Support more general l-systems. I think my implementation currently covers exclusively the simplest case -> context-dependant and non-deterministic
 * expose more drawing options (fine grained color, width), and be smarter about scale, and canvas dimensions.
 * 3D!!!!!
+* create cool l-systems myself
 
