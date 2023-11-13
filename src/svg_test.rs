@@ -1,6 +1,6 @@
-use svg::Document;
-use svg::node::element::Path;
 use svg::node::element::path::Data;
+use svg::node::element::Path;
+use svg::Document;
 
 pub fn create_simple_svg() {
     let data = Data::new()
@@ -17,9 +17,7 @@ pub fn create_simple_svg() {
         .set("stroke-width", 3)
         .set("d", data);
 
-    let document = Document::new()
-        .set("viewBox", (0, 0, 70, 70))
-        .add(path);
+    let document = Document::new().set("viewBox", (0, 0, 70, 70)).add(path);
 
     svg::save("image.svg", &document).unwrap();
 }

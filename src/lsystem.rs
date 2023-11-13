@@ -12,8 +12,7 @@ pub struct LSystemState<'a, E: Clone + Eq + Hash> {
     pub state: Vec<E>, //maybe iter, n
 }
 
-impl <E : Clone + Eq + Hash> LSystemState<'_, E> {
-
+impl<E: Clone + Eq + Hash> LSystemState<'_, E> {
     pub fn lsystem_iter(&mut self) {
         let mut result: Vec<E> = Vec::new();
         for c in &self.state {
@@ -24,10 +23,10 @@ impl <E : Clone + Eq + Hash> LSystemState<'_, E> {
             };
             result.append(&mut c_prime);
         }
-    
+
         self.state = result; // TODO : not this
     }
-    
+
     pub fn lsystem_n_iters(&mut self, n: u32) {
         if n != 0 {
             self.lsystem_iter();
@@ -36,16 +35,13 @@ impl <E : Clone + Eq + Hash> LSystemState<'_, E> {
     }
 }
 
-impl <E : Clone + Eq + Hash> LSystem<E> {
-
+impl<E: Clone + Eq + Hash> LSystem<E> {
     pub fn evolve_lsystem_from_start(&self, n: u32) -> Vec<E> {
         let mut lsystem_state = LSystemState {
-            lsystem : self,
+            lsystem: self,
             state: self.start.clone(),
         };
         lsystem_state.lsystem_n_iters(n);
         lsystem_state.state
     }
-
 }
-

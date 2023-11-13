@@ -4,16 +4,22 @@ use std::f32::consts::PI;
 use crate::lsystem::*;
 use crate::turtle_graphics::Command::{self, *};
 
-fn rot_forward_instructions(angle : f32, scale : f32, g_means_draw : bool) -> HashMap<char, Command>{
+fn rot_forward_instructions(angle: f32, scale: f32, g_means_draw: bool) -> HashMap<char, Command> {
     let mut instructions = HashMap::new();
     instructions.insert('F', DrawForward(scale));
-    instructions.insert('G',if g_means_draw {DrawForward(scale)} else {MoveForward(scale)});
+    instructions.insert(
+        'G',
+        if g_means_draw {
+            DrawForward(scale)
+        } else {
+            MoveForward(scale)
+        },
+    );
     instructions.insert('+', Turn(angle));
     instructions.insert('-', Turn(-angle));
 
     instructions
 }
-
 
 pub fn KOCH() -> (LSystem<char>, HashMap<char, Command>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
@@ -24,14 +30,13 @@ pub fn KOCH() -> (LSystem<char>, HashMap<char, Command>) {
     (
         LSystem {
             start: "F".chars().collect(),
-            rules
+            rules,
         },
-        instructions
+        instructions,
     )
 }
 
 pub fn SIERPINSKI() -> (LSystem<char>, HashMap<char, Command>) {
-    
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F-G+F+G-F".chars().collect());
     rules.insert('G', "GG".chars().collect());
@@ -41,14 +46,13 @@ pub fn SIERPINSKI() -> (LSystem<char>, HashMap<char, Command>) {
     (
         LSystem {
             start: "F-F-F".chars().collect(),
-            rules
+            rules,
         },
-        instructions
+        instructions,
     )
 }
 
 pub fn DRAGON() -> (LSystem<char>, HashMap<char, Command>) {
-    
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F+G".chars().collect());
     rules.insert('G', "F-G".chars().collect());
@@ -58,8 +62,8 @@ pub fn DRAGON() -> (LSystem<char>, HashMap<char, Command>) {
     (
         LSystem {
             start: "F".chars().collect(),
-            rules
+            rules,
         },
-        instructions
+        instructions,
     )
 }
