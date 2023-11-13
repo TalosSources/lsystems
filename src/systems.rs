@@ -4,19 +4,23 @@ use std::f32::consts::PI;
 use crate::lsystem::*;
 use crate::turtle_graphics::Command::{self, *};
 
-fn rot_forward_instructions(angle: f32, scale: f32, g_means_draw: bool) -> HashMap<char, Command> {
+fn rot_forward_instructions(
+    angle: f32,
+    scale: f32,
+    g_means_draw: bool,
+) -> HashMap<char, Vec<Command>> {
     let mut instructions = HashMap::new();
-    instructions.insert('F', DrawForward(scale));
+    instructions.insert('F', vec![DrawForward(scale)]);
     instructions.insert(
         'G',
         if g_means_draw {
-            DrawForward(scale)
+            vec![DrawForward(scale)]
         } else {
-            MoveForward(scale)
+            vec![MoveForward(scale)]
         },
     );
-    instructions.insert('+', Turn(angle));
-    instructions.insert('-', Turn(-angle));
+    instructions.insert('+', vec![Turn(angle)]);
+    instructions.insert('-', vec![Turn(-angle)]);
 
     instructions
 }
@@ -25,15 +29,25 @@ fn rot_forward_stack_instructions(
     angle: f32,
     scale: f32,
     g_means_draw: bool,
-) -> HashMap<char, Command> {
+) -> HashMap<char, Vec<Command>> {
     let mut instructions = rot_forward_instructions(angle, scale, g_means_draw);
-    instructions.insert('[', Push);
-    instructions.insert(']', Pop);
+    instructions.insert('[', vec![Push]);
+    instructions.insert(']', vec![Pop]);
 
     instructions
 }
 
-pub fn KOCH() -> (LSystem<char>, HashMap<char, Command>) {
+fn rot_forward_stack_and_turn_instructions(angle: f32, scale: f32) -> HashMap<char, Vec<Command>> {
+    let mut instructions = HashMap::new();
+    instructions.insert('[', vec![Push, Turn(angle)]);
+    instructions.insert(']', vec![Pop, Turn(-angle)]);
+    instructions.insert('F', vec![DrawForward(scale)]);
+    instructions.insert('G', vec![DrawForward(scale)]);
+
+    instructions
+}
+
+pub fn KOCH() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F+F-F-F+F".chars().collect());
 
@@ -48,7 +62,7 @@ pub fn KOCH() -> (LSystem<char>, HashMap<char, Command>) {
     )
 }
 
-pub fn SIERPINSKI() -> (LSystem<char>, HashMap<char, Command>) {
+pub fn SIERPINSKI() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F-G+F+G-F".chars().collect());
     rules.insert('G', "GG".chars().collect());
@@ -64,7 +78,7 @@ pub fn SIERPINSKI() -> (LSystem<char>, HashMap<char, Command>) {
     )
 }
 
-pub fn DRAGON() -> (LSystem<char>, HashMap<char, Command>) {
+pub fn DRAGON() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F+G".chars().collect());
     rules.insert('G', "F-G".chars().collect());
@@ -80,7 +94,7 @@ pub fn DRAGON() -> (LSystem<char>, HashMap<char, Command>) {
     )
 }
 
-pub fn FRACTAL_PLANT() -> (LSystem<char>, HashMap<char, Command>) {
+pub fn FRACTAL_PLANT() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('X', "F+[[X]-X]-F[-FX]+X".chars().collect());
     rules.insert('F', "FF".chars().collect());
@@ -90,6 +104,22 @@ pub fn FRACTAL_PLANT() -> (LSystem<char>, HashMap<char, Command>) {
     (
         LSystem {
             start: "X".chars().collect(),
+            rules,
+        },
+        instructions,
+    )
+}
+
+pub fn SIMPLE_TREE() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
+    let mut rules: HashMap<char, Vec<char>> = HashMap::new();
+    rules.insert('F', "FF".chars().collect());
+    rules.insert('G', "F[G]G".chars().collect());
+
+    let instructions = rot_forward_stack_and_turn_instructions(PI / 4.0, 0.625);
+
+    (
+        LSystem {
+            start: "G".chars().collect(),
             rules,
         },
         instructions,

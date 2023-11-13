@@ -49,15 +49,15 @@ impl Turtle2D {
 
 pub fn draw<E: Clone + Hash + Eq>(
     string: &Vec<E>,
-    instructions: &HashMap<E, Command>,
+    instructions: &HashMap<E, Vec<Command>>,
     filename: &str,
 ) {
     let mut turtle: Turtle2D = Turtle2D {
-        position: (400., 1900.),
-        direction: (0.4226182617407, -0.9063077870366499),
+        position: (1000., 1900.),
+        direction: (0.0, -1.0),
         pen: (Pen {
             color: (180, 220, 80),
-            width: (0.5),
+            width: (0.4),
         }),
         stack: vec![],
     };
@@ -65,29 +65,31 @@ pub fn draw<E: Clone + Hash + Eq>(
     let mut data = Data::new().move_to(turtle.position);
 
     for c in string {
-        if let Some(ins) = instructions.get(c) {
-            match ins {
-                Command::DrawForward(l) => {
-                    let delta_v = scale(&turtle.direction, *l);
-                    data = data.line_by(delta_v);
-                    turtle.position = add(&turtle.position, &delta_v);
-                }
+        if let Some(instructions) = instructions.get(c) {
+            for instruction in instructions {
+                match instruction {
+                    Command::DrawForward(l) => {
+                        let delta_v = scale(&turtle.direction, *l);
+                        data = data.line_by(delta_v);
+                        turtle.position = add(&turtle.position, &delta_v);
+                    }
 
-                Command::MoveForward(l) => {
-                    let delta_v = scale(&turtle.direction, *l);
-                    data = data.move_by(delta_v);
-                    turtle.position = add(&turtle.position, &delta_v);
-                }
+                    Command::MoveForward(l) => {
+                        let delta_v = scale(&turtle.direction, *l);
+                        data = data.move_by(delta_v);
+                        turtle.position = add(&turtle.position, &delta_v);
+                    }
 
-                Command::Turn(a) => turtle.rotate(*a),
+                    Command::Turn(a) => turtle.rotate(*a),
 
-                Command::Push => turtle.stack.push((turtle.position, turtle.direction)),
+                    Command::Push => turtle.stack.push((turtle.position, turtle.direction)),
 
-                Command::Pop => {
-                    if let Some((pos, dir)) = turtle.stack.pop() {
-                        data = data.move_to(pos);
-                        turtle.position = pos;
-                        turtle.direction = dir;
+                    Command::Pop => {
+                        if let Some((pos, dir)) = turtle.stack.pop() {
+                            data = data.move_to(pos);
+                            turtle.position = pos;
+                            turtle.direction = dir;
+                        }
                     }
                 }
             }
