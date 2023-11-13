@@ -4,10 +4,8 @@ mod systems;
 mod turtle_graphics;
 
 fn main() {
-    let (system, instructions) = systems::DRAGON();
+    let (system, instructions) = systems::FRACTAL_PLANT();
 
-    let result = system.evolve_lsystem_from_start(12);
-    //println!("finished state : {:?}", &result);
-
-    turtle_graphics::draw(&result, &instructions);
+    let result = system.evolve_from_start(7);
+    turtle_graphics::draw(&result, &instructions, "fractal_plant.svg")
 }

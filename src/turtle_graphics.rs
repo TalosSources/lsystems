@@ -12,12 +12,16 @@ type Color = (u8, u8, u8);
 pub enum Command {
     DrawForward(DrawUnit),
     MoveForward(DrawUnit),
-    Turn(DrawUnit), // in radians?
+    Turn(DrawUnit),
+    Push,
+    Pop,
 }
 
 struct Turtle2D {
+    position: Vector2,
     direction: Vector2,
     pen: Pen,
+    stack: Vec<(Vector2, Vector2)>,
 }
 
 struct Pen {
@@ -27,6 +31,10 @@ struct Pen {
 
 fn scale(v: &Vector2, s: f32) -> Vector2 {
     (v.0 * s, v.1 * s)
+}
+
+fn add(v1: &Vector2, v2: &Vector2) -> Vector2 {
+    (v1.0 + v2.0, v1.1 + v2.1)
 }
 
 impl Turtle2D {
@@ -39,29 +47,49 @@ impl Turtle2D {
     }
 }
 
-pub fn draw<E: Clone + Hash + Eq>(string: &Vec<E>, instructions: &HashMap<E, Command>) {
+pub fn draw<E: Clone + Hash + Eq>(
+    string: &Vec<E>,
+    instructions: &HashMap<E, Command>,
+    filename: &str,
+) {
     let mut turtle: Turtle2D = Turtle2D {
-        direction: (1.0, 0.0),
+        position: (400., 1900.),
+        direction: (0.4226182617407, -0.9063077870366499),
         pen: (Pen {
-            color: (0xff, 0x0, 0xff),
-            width: (4.0),
+            color: (180, 220, 80),
+            width: (0.5),
         }),
+        stack: vec![],
     };
 
-    let mut data = Data::new().move_to((1200, 1000));
+    let mut data = Data::new().move_to(turtle.position);
 
     for c in string {
         if let Some(ins) = instructions.get(c) {
             match ins {
                 Command::DrawForward(l) => {
                     let delta_v = scale(&turtle.direction, *l);
-                    data = data.line_by(delta_v)
+                    data = data.line_by(delta_v);
+                    turtle.position = add(&turtle.position, &delta_v);
                 }
+
                 Command::MoveForward(l) => {
                     let delta_v = scale(&turtle.direction, *l);
                     data = data.move_by(delta_v);
+                    turtle.position = add(&turtle.position, &delta_v);
                 }
+
                 Command::Turn(a) => turtle.rotate(*a),
+
+                Command::Push => turtle.stack.push((turtle.position, turtle.direction)),
+
+                Command::Pop => {
+                    if let Some((pos, dir)) = turtle.stack.pop() {
+                        data = data.move_to(pos);
+                        turtle.position = pos;
+                        turtle.direction = dir;
+                    }
+                }
             }
         }
     }
@@ -80,5 +108,5 @@ pub fn draw<E: Clone + Hash + Eq>(string: &Vec<E>, instructions: &HashMap<E, Com
 
     let document = Document::new().set("viewBox", (0, 0, 2000, 2000)).add(path);
 
-    svg::save("lsystem.svg", &document).unwrap();
+    svg::save(filename, &document).unwrap();
 }

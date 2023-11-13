@@ -21,6 +21,18 @@ fn rot_forward_instructions(angle: f32, scale: f32, g_means_draw: bool) -> HashM
     instructions
 }
 
+fn rot_forward_stack_instructions(
+    angle: f32,
+    scale: f32,
+    g_means_draw: bool,
+) -> HashMap<char, Command> {
+    let mut instructions = rot_forward_instructions(angle, scale, g_means_draw);
+    instructions.insert('[', Push);
+    instructions.insert(']', Pop);
+
+    instructions
+}
+
 pub fn KOCH() -> (LSystem<char>, HashMap<char, Command>) {
     let mut rules: HashMap<char, Vec<char>> = HashMap::new();
     rules.insert('F', "F+F-F-F+F".chars().collect());
@@ -62,6 +74,22 @@ pub fn DRAGON() -> (LSystem<char>, HashMap<char, Command>) {
     (
         LSystem {
             start: "F".chars().collect(),
+            rules,
+        },
+        instructions,
+    )
+}
+
+pub fn FRACTAL_PLANT() -> (LSystem<char>, HashMap<char, Command>) {
+    let mut rules: HashMap<char, Vec<char>> = HashMap::new();
+    rules.insert('X', "F+[[X]-X]-F[-FX]+X".chars().collect());
+    rules.insert('F', "FF".chars().collect());
+
+    let instructions = rot_forward_stack_instructions(0.4363, 5.0, true);
+
+    (
+        LSystem {
+            start: "X".chars().collect(),
             rules,
         },
         instructions,
