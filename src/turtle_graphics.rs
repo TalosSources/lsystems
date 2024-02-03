@@ -57,7 +57,7 @@ pub fn draw<E: Clone + Hash + Eq>(
         direction: (0.0, -1.0),
         pen: (Pen {
             color: (180, 220, 80),
-            width: (0.4),
+            width: (1.0),
         }),
         stack: vec![],
     };

@@ -3,6 +3,7 @@ use std::f32::consts::PI;
 
 use crate::lsystem::*;
 use crate::turtle_graphics::Command::{self, *};
+use crate::utils;
 
 fn rot_forward_instructions(
     angle: f32,
@@ -120,6 +121,42 @@ pub fn SIMPLE_TREE() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
     (
         LSystem {
             start: "G".chars().collect(),
+            rules,
+        },
+        instructions,
+    )
+}
+
+pub fn BUSH() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
+    let mut rules = HashMap::new();
+    rules.insert('X', "X[-FFF][+FFF]FX".chars().collect());
+    rules.insert('Y', "YFX[+Y][-Y]".chars().collect());
+
+    let instructions = rot_forward_stack_instructions(utils::degree_to_rad(25.7), 5.0, true);
+
+    (
+        LSystem {
+            start: "Y".chars().collect(),
+            rules,
+        },
+        instructions,
+    )
+}
+
+pub fn SAUPE_TREE() -> (LSystem<char>, HashMap<char, Vec<Command>>) {
+    let mut rules = HashMap::new();
+    rules.insert('V', "[+++W][---W]YV".chars().collect());
+    rules.insert('W', "+X[-W]Z".chars().collect());
+    rules.insert('X', "-W[+X]Z".chars().collect());
+    rules.insert('Y', "YZ".chars().collect());
+    rules.insert('Z', "[-FFF][+FFF]F".chars().collect());
+    
+
+    let instructions = rot_forward_stack_instructions(utils::degree_to_rad(20.0), 40.0, true);
+
+    (
+        LSystem {
+            start: "VZFFF".chars().collect(),
             rules,
         },
         instructions,
